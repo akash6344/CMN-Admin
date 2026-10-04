@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Users - CMNHousing Admin Portal</title>
+  <title>User Management - CMNHousing Admin Portal</title>
   <meta name="description" content="Manage users, roles, and permissions in CMNHousing.">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="app-container">
+    <!-- Sidebar Overlay for Mobile -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- Sidebar Navigation -->
@@ -96,6 +97,7 @@
 
     <!-- Main Content Wrapper -->
     <div class="main-wrapper">
+      <!-- Top Header Navigation -->
       <header class="top-header">
         <div style="display: flex; align-items: center; gap: 12px;">
           <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu">
@@ -111,7 +113,7 @@
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" class="search-input" placeholder="Search users...">
+            <input type="text" class="search-input" id="globalSearch" placeholder="Search property, user, or lead...">
           </div>
         </div>
 
@@ -139,49 +141,419 @@
         </div>
       </header>
 
+      <!-- Main Page Content -->
       <main class="page-content">
-        <div class="page-header">
-          <h1 class="page-title">User Management</h1>
-          <p class="page-subtitle">Manage users, roles, and permissions</p>
+        <!-- Page Header with Action Button -->
+        <div class="page-header-actions">
+          <div>
+            <h1 class="page-title">User Management</h1>
+            <p class="page-subtitle">Manage users, roles, and permissions</p>
+          </div>
+          <button class="btn-primary" id="openAddUserModal">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <line x1="19" y1="8" x2="19" y2="14"></line>
+              <line x1="22" y1="11" x2="16" y2="11"></line>
+            </svg>
+            Add User
+          </button>
         </div>
 
-        <div class="wip-container">
-          <div class="wip-card">
-            <div class="wip-icon-circle">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        <!-- Users Table Card -->
+        <div class="card" style="padding: 20px;">
+          <!-- Filter Search Input -->
+          <div style="margin-bottom: 20px; max-width: 420px;">
+            <div class="search-container" style="width: 100%;">
+              <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
+              <input type="text" class="search-input" id="userSearchInput" placeholder="Search users...">
             </div>
-            <h2 class="wip-title">User Management Module</h2>
-            <p class="wip-desc">This screen is currently under active development. You will soon be able to view, invite, filter, and manage user permissions here.</p>
-            <span class="wip-badge">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
-              </svg>
-              Work in Progress
-            </span>
+          </div>
+
+          <!-- Responsive Table -->
+          <div class="table-responsive">
+            <table class="custom-table" id="usersTable">
+              <thead>
+                <tr>
+                  <th style="width: 28%;">USER</th>
+                  <th style="width: 16%;">ROLE</th>
+                  <th style="width: 16%;">STATUS</th>
+                  <th style="width: 14%;">PROPERTIES</th>
+                  <th style="width: 16%;">JOINED</th>
+                  <th style="width: 10%; text-align: right;">ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody id="userTableBody">
+                <!-- User 1: Rahul Sharma -->
+                <tr data-user-name="Rahul Sharma" data-user-email="rahul@example.com" data-user-role="Owner" data-user-status="active">
+                  <td>
+                    <div class="user-cell">
+                      <div class="user-cell-avatar">RS</div>
+                      <div class="user-cell-details">
+                        <span class="user-cell-name">Rahul Sharma</span>
+                        <span class="user-cell-email">rahul@example.com</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="role-badge owner">Owner</span>
+                  </td>
+                  <td>
+                    <span class="status-pill active">
+                      <span class="dot"></span>
+                      active
+                    </span>
+                  </td>
+                  <td style="font-weight: 600; color: var(--text-primary);">5</td>
+                  <td>Jan 2024</td>
+                  <td style="text-align: right;">
+                    <button class="btn-action-more" title="More options" aria-label="More options">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <circle cx="5" cy="12" r="2"></circle>
+                        <circle cx="12" cy="12" r="2"></circle>
+                        <circle cx="19" cy="12" r="2"></circle>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+
+                <!-- User 2: Priya Patel -->
+                <tr data-user-name="Priya Patel" data-user-email="priya@example.com" data-user-role="User" data-user-status="active">
+                  <td>
+                    <div class="user-cell">
+                      <div class="user-cell-avatar">PP</div>
+                      <div class="user-cell-details">
+                        <span class="user-cell-name">Priya Patel</span>
+                        <span class="user-cell-email">priya@example.com</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="role-badge user">User</span>
+                  </td>
+                  <td>
+                    <span class="status-pill active">
+                      <span class="dot"></span>
+                      active
+                    </span>
+                  </td>
+                  <td style="font-weight: 600; color: var(--text-primary);">0</td>
+                  <td>Feb 2024</td>
+                  <td style="text-align: right;">
+                    <button class="btn-action-more" title="More options" aria-label="More options">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <circle cx="5" cy="12" r="2"></circle>
+                        <circle cx="12" cy="12" r="2"></circle>
+                        <circle cx="19" cy="12" r="2"></circle>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+
+                <!-- User 3: Amit Kumar -->
+                <tr data-user-name="Amit Kumar" data-user-email="amit@example.com" data-user-role="Owner" data-user-status="active">
+                  <td>
+                    <div class="user-cell">
+                      <div class="user-cell-avatar">AK</div>
+                      <div class="user-cell-details">
+                        <span class="user-cell-name">Amit Kumar</span>
+                        <span class="user-cell-email">amit@example.com</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="role-badge owner">Owner</span>
+                  </td>
+                  <td>
+                    <span class="status-pill active">
+                      <span class="dot"></span>
+                      active
+                    </span>
+                  </td>
+                  <td style="font-weight: 600; color: var(--text-primary);">3</td>
+                  <td>Mar 2024</td>
+                  <td style="text-align: right;">
+                    <button class="btn-action-more" title="More options" aria-label="More options">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <circle cx="5" cy="12" r="2"></circle>
+                        <circle cx="12" cy="12" r="2"></circle>
+                        <circle cx="19" cy="12" r="2"></circle>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+
+                <!-- User 4: Sneha Reddy -->
+                <tr data-user-name="Sneha Reddy" data-user-email="sneha@example.com" data-user-role="Moderator" data-user-status="active">
+                  <td>
+                    <div class="user-cell">
+                      <div class="user-cell-avatar">SR</div>
+                      <div class="user-cell-details">
+                        <span class="user-cell-name">Sneha Reddy</span>
+                        <span class="user-cell-email">sneha@example.com</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="role-badge moderator">Moderator</span>
+                  </td>
+                  <td>
+                    <span class="status-pill active">
+                      <span class="dot"></span>
+                      active
+                    </span>
+                  </td>
+                  <td style="font-weight: 600; color: var(--text-primary);">0</td>
+                  <td>Apr 2024</td>
+                  <td style="text-align: right;">
+                    <button class="btn-action-more" title="More options" aria-label="More options">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <circle cx="5" cy="12" r="2"></circle>
+                        <circle cx="12" cy="12" r="2"></circle>
+                        <circle cx="19" cy="12" r="2"></circle>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+
+                <!-- User 5: Vikram Singh -->
+                <tr data-user-name="Vikram Singh" data-user-email="vikram@example.com" data-user-role="User" data-user-status="suspended">
+                  <td>
+                    <div class="user-cell">
+                      <div class="user-cell-avatar">VS</div>
+                      <div class="user-cell-details">
+                        <span class="user-cell-name">Vikram Singh</span>
+                        <span class="user-cell-email">vikram@example.com</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="role-badge user">User</span>
+                  </td>
+                  <td>
+                    <span class="status-pill suspended">
+                      <span class="dot"></span>
+                      suspended
+                    </span>
+                  </td>
+                  <td style="font-weight: 600; color: var(--text-primary);">0</td>
+                  <td>May 2024</td>
+                  <td style="text-align: right;">
+                    <button class="btn-action-more" title="More options" aria-label="More options">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <circle cx="5" cy="12" r="2"></circle>
+                        <circle cx="12" cy="12" r="2"></circle>
+                        <circle cx="19" cy="12" r="2"></circle>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+
+                <!-- User 6: Meera Iyer -->
+                <tr data-user-name="Meera Iyer" data-user-email="meera@example.com" data-user-role="Owner" data-user-status="inactive">
+                  <td>
+                    <div class="user-cell">
+                      <div class="user-cell-avatar">MI</div>
+                      <div class="user-cell-details">
+                        <span class="user-cell-name">Meera Iyer</span>
+                        <span class="user-cell-email">meera@example.com</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="role-badge owner">Owner</span>
+                  </td>
+                  <td>
+                    <span class="status-pill inactive">
+                      <span class="dot"></span>
+                      inactive
+                    </span>
+                  </td>
+                  <td style="font-weight: 600; color: var(--text-primary);">2</td>
+                  <td>Jun 2024</td>
+                  <td style="text-align: right;">
+                    <button class="btn-action-more" title="More options" aria-label="More options">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <circle cx="5" cy="12" r="2"></circle>
+                        <circle cx="12" cy="12" r="2"></circle>
+                        <circle cx="19" cy="12" r="2"></circle>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </main>
     </div>
   </div>
 
+  <!-- Add User Modal Dialog -->
+  <div class="modal-backdrop" id="addUserModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Add New User</h3>
+        <button class="modal-close-btn" id="closeAddUserModal" aria-label="Close modal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <form id="addUserForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="userNameInput">Full Name</label>
+            <input type="text" class="form-control" id="userNameInput" placeholder="e.g. Ananya Sharma" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="userEmailInput">Email Address</label>
+            <input type="email" class="form-control" id="userEmailInput" placeholder="e.g. ananya@example.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="userRoleSelect">Role</label>
+            <select class="form-control" id="userRoleSelect" required>
+              <option value="Owner">Owner</option>
+              <option value="User" selected>User</option>
+              <option value="Moderator">Moderator</option>
+              <option value="Admin">Admin</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="userStatusSelect">Status</label>
+            <select class="form-control" id="userStatusSelect" required>
+              <option value="active" selected>Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="suspended">Suspended</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="cancelAddUser">Cancel</button>
+          <button type="submit" class="btn-primary">Create User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Interactive Logic -->
   <script>
+    // Mobile Sidebar Toggle
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
+
     if (mobileMenuBtn && sidebar && sidebarOverlay) {
       mobileMenuBtn.addEventListener('click', () => {
         sidebar.classList.toggle('open');
         sidebarOverlay.classList.toggle('active');
       });
+
       sidebarOverlay.addEventListener('click', () => {
         sidebar.classList.remove('open');
         sidebarOverlay.classList.remove('active');
+      });
+    }
+
+    // Modal Controls
+    const addUserModal = document.getElementById('addUserModal');
+    const openAddUserModal = document.getElementById('openAddUserModal');
+    const closeAddUserModal = document.getElementById('closeAddUserModal');
+    const cancelAddUser = document.getElementById('cancelAddUser');
+    const addUserForm = document.getElementById('addUserForm');
+
+    function openModal() {
+      addUserModal.classList.add('open');
+      document.getElementById('userNameInput').focus();
+    }
+
+    function closeModal() {
+      addUserModal.classList.remove('open');
+      addUserForm.reset();
+    }
+
+    openAddUserModal.addEventListener('click', openModal);
+    closeAddUserModal.addEventListener('click', closeModal);
+    cancelAddUser.addEventListener('click', closeModal);
+    addUserModal.addEventListener('click', (e) => {
+      if (e.target === addUserModal) closeModal();
+    });
+
+    // Add User Form Submission
+    addUserForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('userNameInput').value.trim();
+      const email = document.getElementById('userEmailInput').value.trim();
+      const role = document.getElementById('userRoleSelect').value;
+      const status = document.getElementById('userStatusSelect').value;
+
+      if (!name || !email) return;
+
+      // Extract Initials
+      const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'U';
+      const roleClass = role.toLowerCase();
+
+      // Current Month Year
+      const date = new Date();
+      const monthYear = date.toLocaleString('default', { month: 'short' }) + ' ' + date.getFullYear();
+
+      const tbody = document.getElementById('userTableBody');
+      const tr = document.createElement('tr');
+      tr.setAttribute('data-user-name', name);
+      tr.setAttribute('data-user-email', email);
+      tr.setAttribute('data-user-role', role);
+      tr.setAttribute('data-user-status', status);
+
+      tr.innerHTML = `
+        <td>
+          <div class="user-cell">
+            <div class="user-cell-avatar">${initials}</div>
+            <div class="user-cell-details">
+              <span class="user-cell-name">${name}</span>
+              <span class="user-cell-email">${email}</span>
+            </div>
+          </div>
+        </td>
+        <td>
+          <span class="role-badge ${roleClass}">${role}</span>
+        </td>
+        <td>
+          <span class="status-pill ${status}">
+            <span class="dot"></span>
+            ${status}
+          </span>
+        </td>
+        <td style="font-weight: 600; color: var(--text-primary);">0</td>
+        <td>${monthYear}</td>
+        <td style="text-align: right;">
+          <button class="btn-action-more" title="More options" aria-label="More options">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="5" cy="12" r="2"></circle>
+              <circle cx="12" cy="12" r="2"></circle>
+              <circle cx="19" cy="12" r="2"></circle>
+            </svg>
+          </button>
+        </td>
+      `;
+
+      tbody.insertBefore(tr, tbody.firstChild);
+      closeModal();
+    });
+
+    // Real-Time Table Search Filter
+    const userSearchInput = document.getElementById('userSearchInput');
+    if (userSearchInput) {
+      userSearchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        const rows = document.querySelectorAll('#userTableBody tr');
+        rows.forEach(row => {
+          const text = row.textContent.toLowerCase();
+          row.style.display = text.includes(query) ? '' : 'none';
+        });
       });
     }
   </script>
