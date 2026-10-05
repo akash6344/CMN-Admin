@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Properties - CMNHousing Admin Portal</title>
-  <meta name="description" content="Manage property listings and approvals in CMNHousing.">
+  <title>Property Management - CMNHousing Admin Portal</title>
+  <meta name="description" content="Review, approve, and manage all property listings in CMNHousing.">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="app-container">
+    <!-- Sidebar Overlay for Mobile -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- Sidebar Navigation -->
@@ -96,6 +97,7 @@
 
     <!-- Main Content Wrapper -->
     <div class="main-wrapper">
+      <!-- Top Header Navigation -->
       <header class="top-header">
         <div style="display: flex; align-items: center; gap: 12px;">
           <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu">
@@ -111,7 +113,7 @@
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" class="search-input" placeholder="Search properties...">
+            <input type="text" class="search-input" id="globalSearch" placeholder="Search property, user, or lead...">
           </div>
         </div>
 
@@ -139,45 +141,305 @@
         </div>
       </header>
 
+      <!-- Main Page Content -->
       <main class="page-content">
-        <div class="page-header">
-          <h1 class="page-title">Properties</h1>
-          <p class="page-subtitle">Review, approve, and manage all property listings</p>
+        <!-- Page Header with Action Button -->
+        <div class="page-header-actions">
+          <div>
+            <h1 class="page-title">Property Management</h1>
+            <p class="page-subtitle">Review, approve, and manage all property listings</p>
+          </div>
+          <button class="btn-primary" id="openAddPropertyModal">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Add Property
+          </button>
         </div>
 
-        <div class="wip-container">
-          <div class="wip-card">
-            <div class="wip-icon-circle">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
-                <path d="M9 22v-4h6v4"></path>
-                <path d="M8 6h.01"></path>
-                <path d="M16 6h.01"></path>
-                <path d="M8 10h.01"></path>
-                <path d="M16 10h.01"></path>
-                <path d="M8 14h.01"></path>
-                <path d="M16 14h.01"></path>
-              </svg>
+        <!-- Metric Cards Grid -->
+        <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 24px;">
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-title">Total Listings</span>
+              <div class="stat-icon-wrapper">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                  <path d="M9 22v-4h6v4"></path>
+                </svg>
+              </div>
             </div>
-            <h2 class="wip-title">Properties Module</h2>
-            <p class="wip-desc">This screen is currently under active development. You will soon be able to review submissions, inspect photos, edit details, and approve or reject listings.</p>
-            <span class="wip-badge">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
-              </svg>
-              Work in Progress
-            </span>
+            <div class="stat-value" id="countTotal">1,024</div>
+            <div class="stat-trend positive"><span>↑ 8% from last week</span></div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-title">Pending Approval</span>
+              <div class="stat-icon-wrapper" style="color: var(--accent-amber);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+              </div>
+            </div>
+            <div class="stat-value" id="countPending">128</div>
+            <div class="stat-trend negative"><span>Needs admin review</span></div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-title">Approved Listings</span>
+              <div class="stat-icon-wrapper" style="color: var(--accent-green);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+              </div>
+            </div>
+            <div class="stat-value" id="countApproved">854</div>
+            <div class="stat-trend positive"><span>Active on marketplace</span></div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-title">Rejected Listings</span>
+              <div class="stat-icon-wrapper" style="color: var(--accent-red);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="15" y1="9" x2="9" y2="15"></line>
+                  <line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+              </div>
+            </div>
+            <div class="stat-value" id="countRejected">42</div>
+            <div class="stat-trend negative"><span>Violations or duplicate</span></div>
+          </div>
+        </div>
+
+        <!-- Properties Table Card -->
+        <div class="card" style="padding: 20px;">
+          <!-- Filter Controls -->
+          <div class="filter-bar">
+            <div class="filter-tabs">
+              <button class="filter-tab active" data-status="all">All Properties</button>
+              <button class="filter-tab" data-status="pending">Pending (3)</button>
+              <button class="filter-tab" data-status="approved">Approved (3)</button>
+              <button class="filter-tab" data-status="rejected">Rejected (1)</button>
+            </div>
+
+            <div style="display: flex; gap: 12px; flex: 1; max-width: 480px;">
+              <div class="search-container" style="flex: 1;">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" class="search-input" id="propertySearchInput" placeholder="Search title, owner, or city...">
+              </div>
+            </div>
+          </div>
+
+          <!-- Properties Table -->
+          <div class="table-responsive">
+            <table class="custom-table" id="propertiesTable">
+              <thead>
+                <tr>
+                  <th style="width: 12%;">ID</th>
+                  <th style="width: 26%;">PROPERTY</th>
+                  <th style="width: 18%;">OWNER</th>
+                  <th style="width: 14%;">CITY</th>
+                  <th style="width: 14%;">PRICE</th>
+                  <th style="width: 16%;">STATUS</th>
+                  <th style="width: 10%; text-align: right;">ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody id="propertyTableBody">
+                <tr data-status="pending">
+                  <td class="table-id">#P1023</td>
+                  <td><span class="table-property-title">3BHK Apartment</span></td>
+                  <td>Rahul Sharma</td>
+                  <td>Bangalore</td>
+                  <td class="table-price">₹85L</td>
+                  <td><span class="badge badge-pending">Pending</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn-ghost btn-sm-action" onclick="viewPropertyDetails('#P1023', '3BHK Apartment', 'Rahul Sharma', 'Bangalore', '₹85L', 'Pending', 'Spacious 3BHK flat in Indiranagar with modular kitchen, 2 balconies, and basement parking.')">Details</button>
+                  </td>
+                </tr>
+                <tr data-status="approved">
+                  <td class="table-id">#P1024</td>
+                  <td><span class="table-property-title">Villa with Garden</span></td>
+                  <td>Priya Patel</td>
+                  <td>Mumbai</td>
+                  <td class="table-price">₹2.1Cr</td>
+                  <td><span class="badge badge-approved">Approved</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn-ghost btn-sm-action" onclick="viewPropertyDetails('#P1024', 'Villa with Garden', 'Priya Patel', 'Mumbai', '₹2.1Cr', 'Approved', 'Luxury 4BHK villa featuring a private swimming pool, private lawn, and smart home automation.')">Details</button>
+                  </td>
+                </tr>
+                <tr data-status="pending">
+                  <td class="table-id">#P1025</td>
+                  <td><span class="table-property-title">Studio Flat</span></td>
+                  <td>Amit Kumar</td>
+                  <td>Delhi</td>
+                  <td class="table-price">₹45L</td>
+                  <td><span class="badge badge-pending">Pending</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn-ghost btn-sm-action" onclick="viewPropertyDetails('#P1025', 'Studio Flat', 'Amit Kumar', 'Delhi', '₹45L', 'Pending', 'Compact fully furnished studio apartment near Connaught Place ideal for working professionals.')">Details</button>
+                  </td>
+                </tr>
+                <tr data-status="approved">
+                  <td class="table-id">#P1026</td>
+                  <td><span class="table-property-title">Penthouse</span></td>
+                  <td>Sneha Reddy</td>
+                  <td>Hyderabad</td>
+                  <td class="table-price">₹1.8Cr</td>
+                  <td><span class="badge badge-approved">Approved</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn-ghost btn-sm-action" onclick="viewPropertyDetails('#P1026', 'Penthouse', 'Sneha Reddy', 'Hyderabad', '₹1.8Cr', 'Approved', 'Panoramic city view penthouse on 28th floor in Gachibowli with sky terrace.')">Details</button>
+                  </td>
+                </tr>
+                <tr data-status="rejected">
+                  <td class="table-id">#P1027</td>
+                  <td><span class="table-property-title">2BHK Flat</span></td>
+                  <td>Vikram Singh</td>
+                  <td>Chennai</td>
+                  <td class="table-price">₹65L</td>
+                  <td><span class="badge badge-rejected">Rejected</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn-ghost btn-sm-action" onclick="viewPropertyDetails('#P1027', '2BHK Flat', 'Vikram Singh', 'Chennai', '₹65L', 'Rejected', 'Rejected due to insufficient property documentation and unverified ownership deed.')">Details</button>
+                  </td>
+                </tr>
+                <tr data-status="pending">
+                  <td class="table-id">#P1028</td>
+                  <td><span class="table-property-title">Beachside Villa</span></td>
+                  <td>Meera Iyer</td>
+                  <td>Goa</td>
+                  <td class="table-price">₹3.5Cr</td>
+                  <td><span class="badge badge-pending">Pending</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn-ghost btn-sm-action" onclick="viewPropertyDetails('#P1028', 'Beachside Villa', 'Meera Iyer', 'Goa', '₹3.5Cr', 'Pending', 'Stunning beachfront villa in Anjuna with ocean view patio.')">Details</button>
+                  </td>
+                </tr>
+                <tr data-status="approved">
+                  <td class="table-id">#P1029</td>
+                  <td><span class="table-property-title">Commercial Office</span></td>
+                  <td>Rajesh K</td>
+                  <td>Pune</td>
+                  <td class="table-price">₹1.2Cr</td>
+                  <td><span class="badge badge-approved">Approved</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn-ghost btn-sm-action" onclick="viewPropertyDetails('#P1029', 'Commercial Office', 'Rajesh K', 'Pune', '₹1.2Cr', 'Approved', '2200 sqft IT park office space ready for immediate possession.')">Details</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </main>
     </div>
   </div>
 
+  <!-- Add Property Modal -->
+  <div class="modal-backdrop" id="addPropertyModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Property Listing</h3>
+        <button class="modal-close-btn" id="closeAddPropertyModal" aria-label="Close modal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <form id="addPropertyForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="propTitleInput">Property Title</label>
+            <input type="text" class="form-control" id="propTitleInput" placeholder="e.g. 3BHK Luxury Duplex" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="propOwnerInput">Owner Name</label>
+            <input type="text" class="form-control" id="propOwnerInput" placeholder="e.g. Rohan Malhotra" required>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label" for="propCityInput">City</label>
+              <input type="text" class="form-control" id="propCityInput" placeholder="e.g. Bangalore" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="propPriceInput">Price</label>
+              <input type="text" class="form-control" id="propPriceInput" placeholder="e.g. ₹95L" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="propStatusSelect">Initial Status</label>
+            <select class="form-control" id="propStatusSelect" required>
+              <option value="Pending" selected>Pending Review</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="propDescInput">Description</label>
+            <textarea class="form-control" id="propDescInput" rows="3" placeholder="Provide property specifications and details..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="cancelAddProperty">Cancel</button>
+          <button type="submit" class="btn-primary">Add Listing</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Property Details & Action Modal -->
+  <div class="modal-backdrop" id="propDetailModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="detailPropTitle">Property Details</h3>
+        <button class="modal-close-btn" id="closeDetailModal" aria-label="Close modal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div style="background-color: var(--bg-input); padding: 14px; border-radius: var(--radius-md); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;" id="detailPropId">#P1023</span>
+            <div style="font-size: 18px; font-weight: 800;" id="detailPropPrice">₹85L</div>
+          </div>
+          <span class="badge badge-pending" id="detailPropBadge">Pending</span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px; font-size: 13.5px; margin-bottom: 16px;">
+          <div><strong>Owner:</strong> <span id="detailPropOwner">Rahul Sharma</span></div>
+          <div><strong>City:</strong> <span id="detailPropCity">Bangalore</span></div>
+          <div><strong>Description:</strong></div>
+          <div style="color: var(--text-secondary); background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;" id="detailPropDesc">
+            Property overview and owner specs.
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content: space-between;">
+        <button type="button" class="btn-secondary" style="color: var(--accent-red); border-color: #fca5a5;" id="btnRejectProp">Reject Listing</button>
+        <button type="button" class="btn-primary" style="background-color: #10b981;" id="btnApproveProp">Approve Listing</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-notification" id="toast">Changes saved successfully</div>
+
+  <!-- Interactive JavaScript Logic -->
   <script>
+    // Mobile Sidebar Toggle
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
+
     if (mobileMenuBtn && sidebar && sidebarOverlay) {
       mobileMenuBtn.addEventListener('click', () => {
         sidebar.classList.toggle('open');
@@ -186,6 +448,140 @@
       sidebarOverlay.addEventListener('click', () => {
         sidebar.classList.remove('open');
         sidebarOverlay.classList.remove('active');
+      });
+    }
+
+    // Toast Function
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Modal Add Property Controls
+    const addPropertyModal = document.getElementById('addPropertyModal');
+    const openAddPropertyModal = document.getElementById('openAddPropertyModal');
+    const closeAddPropertyModal = document.getElementById('closeAddPropertyModal');
+    const cancelAddProperty = document.getElementById('cancelAddProperty');
+    const addPropertyForm = document.getElementById('addPropertyForm');
+
+    openAddPropertyModal.addEventListener('click', () => addPropertyModal.classList.add('open'));
+    closeAddPropertyModal.addEventListener('click', () => addPropertyModal.classList.remove('open'));
+    cancelAddProperty.addEventListener('click', () => addPropertyModal.classList.remove('open'));
+
+    addPropertyForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = document.getElementById('propTitleInput').value.trim();
+      const owner = document.getElementById('propOwnerInput').value.trim();
+      const city = document.getElementById('propCityInput').value.trim();
+      const price = document.getElementById('propPriceInput').value.trim();
+      const status = document.getElementById('propStatusSelect').value;
+      const desc = document.getElementById('propDescInput').value.trim() || 'No description provided.';
+
+      if (!title || !owner || !city || !price) return;
+
+      const newId = '#P' + (1030 + Math.floor(Math.random() * 90));
+      const tbody = document.getElementById('propertyTableBody');
+      const tr = document.createElement('tr');
+      tr.setAttribute('data-status', status.toLowerCase());
+
+      const badgeClass = status === 'Approved' ? 'badge-approved' : (status === 'Rejected' ? 'badge-rejected' : 'badge-pending');
+
+      tr.innerHTML = `
+        <td class="table-id">${newId}</td>
+        <td><span class="table-property-title">${title}</span></td>
+        <td>${owner}</td>
+        <td>${city}</td>
+        <td class="table-price">${price}</td>
+        <td><span class="badge ${badgeClass}">${status}</span></td>
+        <td style="text-align: right;">
+          <button class="btn-ghost btn-sm-action" onclick="viewPropertyDetails('${newId}', '${title}', '${owner}', '${city}', '${price}', '${status}', '${desc.replace(/'/g, "\\'")}')">Details</button>
+        </td>
+      `;
+
+      tbody.insertBefore(tr, tbody.firstChild);
+      addPropertyModal.classList.remove('open');
+      addPropertyForm.reset();
+      showToast(`Added new listing ${newId}`);
+    });
+
+    // Property Detail Modal & Approve/Reject Actions
+    let activeRow = null;
+    function viewPropertyDetails(id, title, owner, city, price, status, desc) {
+      document.getElementById('detailPropId').textContent = id;
+      document.getElementById('detailPropTitle').textContent = title;
+      document.getElementById('detailPropOwner').textContent = owner;
+      document.getElementById('detailPropCity').textContent = city;
+      document.getElementById('detailPropPrice').textContent = price;
+      document.getElementById('detailPropDesc').textContent = desc;
+
+      const badge = document.getElementById('detailPropBadge');
+      badge.textContent = status;
+      badge.className = `badge badge-${status.toLowerCase()}`;
+
+      // Find active row
+      const rows = document.querySelectorAll('#propertyTableBody tr');
+      rows.forEach(r => {
+        if (r.querySelector('.table-id').textContent === id) activeRow = r;
+      });
+
+      document.getElementById('propDetailModal').classList.add('open');
+    }
+
+    document.getElementById('closeDetailModal').addEventListener('click', () => {
+      document.getElementById('propDetailModal').classList.remove('open');
+    });
+
+    document.getElementById('btnApproveProp').addEventListener('click', () => {
+      if (activeRow) {
+        activeRow.setAttribute('data-status', 'approved');
+        const badge = activeRow.querySelector('.badge');
+        badge.textContent = 'Approved';
+        badge.className = 'badge badge-approved';
+      }
+      document.getElementById('propDetailModal').classList.remove('open');
+      showToast('Property listing approved!');
+    });
+
+    document.getElementById('btnRejectProp').addEventListener('click', () => {
+      if (activeRow) {
+        activeRow.setAttribute('data-status', 'rejected');
+        const badge = activeRow.querySelector('.badge');
+        badge.textContent = 'Rejected';
+        badge.className = 'badge badge-rejected';
+      }
+      document.getElementById('propDetailModal').classList.remove('open');
+      showToast('Property listing rejected.');
+    });
+
+    // Real-Time Filter Tabs & Search Filter
+    const filterTabs = document.querySelectorAll('.filter-tab');
+    const propertySearchInput = document.getElementById('propertySearchInput');
+
+    filterTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        filterTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        applyFilters();
+      });
+    });
+
+    propertySearchInput.addEventListener('input', applyFilters);
+
+    function applyFilters() {
+      const activeStatus = document.querySelector('.filter-tab.active').getAttribute('data-status');
+      const query = propertySearchInput.value.toLowerCase();
+      const rows = document.querySelectorAll('#propertyTableBody tr');
+
+      rows.forEach(row => {
+        const rowStatus = row.getAttribute('data-status');
+        const text = row.textContent.toLowerCase();
+
+        const matchesStatus = (activeStatus === 'all') || (rowStatus === activeStatus);
+        const matchesQuery = text.includes(query);
+
+        row.style.display = (matchesStatus && matchesQuery) ? '' : 'none';
       });
     }
   </script>

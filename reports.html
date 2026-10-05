@@ -4,11 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reports & Analytics - CMNHousing Admin Portal</title>
-  <meta name="description" content="Comprehensive insights and analytics into platform performance.">
+  <meta name="description" content="Comprehensive insights into platform performance in CMNHousing.">
   <link rel="stylesheet" href="style.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="app-container">
+    <!-- Sidebar Overlay for Mobile -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- Sidebar Navigation -->
@@ -60,7 +63,7 @@
         </a>
         <a href="leads-bargains.html" class="nav-link" id="nav-leads">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="23 6 13.5 15.5 8.5 10.5 18"></polyline>
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
             <polyline points="17 6 23 6 23 12"></polyline>
           </svg>
           Leads & Bargains
@@ -96,6 +99,7 @@
 
     <!-- Main Content Wrapper -->
     <div class="main-wrapper">
+      <!-- Top Header Navigation -->
       <header class="top-header">
         <div style="display: flex; align-items: center; gap: 12px;">
           <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu">
@@ -111,7 +115,7 @@
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" class="search-input" placeholder="Search reports...">
+            <input type="text" class="search-input" id="globalSearch" placeholder="Search property, user, or lead...">
           </div>
         </div>
 
@@ -139,40 +143,103 @@
         </div>
       </header>
 
+      <!-- Main Page Content -->
       <main class="page-content">
-        <div class="page-header">
-          <h1 class="page-title">Reports & Analytics</h1>
-          <p class="page-subtitle">Comprehensive insights into platform performance</p>
-        </div>
+        <!-- Page Header with Date Filter and Export Action -->
+        <div class="page-header-actions">
+          <div>
+            <h1 class="page-title">Reports & Analytics</h1>
+            <p class="page-subtitle">Comprehensive insights into platform performance</p>
+          </div>
 
-        <div class="wip-container">
-          <div class="wip-card">
-            <div class="wip-icon-circle">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="20" x2="18" y2="10"></line>
-                <line x1="12" y1="20" x2="12" y2="4"></line>
-                <line x1="6" y1="20" x2="6" y2="14"></line>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="position: relative;">
+              <select class="btn-ghost" id="timeframeSelect" style="padding-right: 32px; appearance: none; -webkit-appearance: none; font-size: 13.5px; font-weight: 600; cursor: pointer;">
+                <option value="6m" selected>📅 Last 6 Months</option>
+                <option value="30d">📅 Last 30 Days</option>
+                <option value="1y">📅 Last 1 Year</option>
+              </select>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--text-muted);">
+                <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
             </div>
-            <h2 class="wip-title">Reports & Analytics Module</h2>
-            <p class="wip-desc">This screen is currently under active development. You will soon be able to view monthly listings vs leads, property distributions, and export custom analytics.</p>
-            <span class="wip-badge">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
+
+            <button class="btn-dark" id="exportReportBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
               </svg>
-              Work in Progress
-            </span>
+              Export
+            </button>
+          </div>
+        </div>
+
+        <!-- 2x2 Analytics Charts Grid matching WhatsApp Image 2026-10-02 at 05.52.46 (1).jpeg & 05.52.47 (1).jpeg -->
+        <div class="reports-grid">
+          <!-- Chart 1: Monthly Listings & Leads -->
+          <div class="report-card">
+            <h3 class="report-card-title">Monthly Listings & Leads</h3>
+            <div class="chart-wrapper-lg">
+              <canvas id="monthlyBarChart"></canvas>
+            </div>
+            <div class="chart-legend" style="justify-content: center; margin-top: 16px;">
+              <div class="legend-item">
+                <span class="legend-dot" style="background-color: #0f172a;"></span>
+                <span>Listings</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-dot" style="background-color: #f59e0b;"></span>
+                <span>Leads</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart 2: Property Type Distribution -->
+          <div class="report-card">
+            <h3 class="report-card-title">Property Type Distribution</h3>
+            <div class="chart-wrapper-lg">
+              <canvas id="donutChart"></canvas>
+            </div>
+            <div class="chart-legend" style="justify-content: center; gap: 14px; flex-wrap: wrap; margin-top: 16px;">
+              <div class="legend-item"><span class="legend-dot" style="background-color: #0f172a;"></span><span>Apartments (45%)</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background-color: #f59e0b;"></span><span>Villas (20%)</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background-color: #10b981;"></span><span>Houses (15%)</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background-color: #06b6d4;"></span><span>Plots (12%)</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background-color: #8b5cf6;"></span><span>Commercial (8%)</span></div>
+            </div>
+          </div>
+
+          <!-- Chart 3: Revenue Trend (₹ Lakhs) -->
+          <div class="report-card">
+            <h3 class="report-card-title">Revenue Trend (₹ Lakhs)</h3>
+            <div class="chart-wrapper-lg">
+              <canvas id="revenueLineChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Chart 4: Properties by City -->
+          <div class="report-card">
+            <h3 class="report-card-title">Properties by City</h3>
+            <div class="chart-wrapper-lg">
+              <canvas id="cityBarChart"></canvas>
+            </div>
           </div>
         </div>
       </main>
     </div>
   </div>
 
+  <!-- Toast Notification -->
+  <div class="toast-notification" id="toast">Analytics report exported</div>
+
+  <!-- Charts JavaScript Setup -->
   <script>
+    // Mobile Sidebar Toggle
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
+
     if (mobileMenuBtn && sidebar && sidebarOverlay) {
       mobileMenuBtn.addEventListener('click', () => {
         sidebar.classList.toggle('open');
@@ -183,6 +250,164 @@
         sidebarOverlay.classList.remove('active');
       });
     }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    document.getElementById('exportReportBtn').addEventListener('click', () => {
+      showToast('Exporting analytics report as CSV...');
+    });
+
+    // Font setting for Chart.js
+    Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+
+    // Chart 1: Grouped Bar Chart
+    const ctxBar = document.getElementById('monthlyBarChart').getContext('2d');
+    const monthlyBarChart = new Chart(ctxBar, {
+      type: 'bar',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [
+          {
+            label: 'Listings',
+            data: [120, 145, 180, 165, 205, 225],
+            backgroundColor: '#0f172a',
+            borderRadius: 4,
+            barPercentage: 0.6,
+            categoryPercentage: 0.5
+          },
+          {
+            label: 'Leads',
+            data: [80, 95, 120, 110, 140, 160],
+            backgroundColor: '#f59e0b',
+            borderRadius: 4,
+            barPercentage: 0.6,
+            categoryPercentage: 0.5
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#94a3b8' } },
+          y: { grid: { borderDash: [3, 3], color: '#f1f5f9' }, ticks: { color: '#94a3b8', stepSize: 55 } }
+        }
+      }
+    });
+
+    // Chart 2: Donut Chart
+    const ctxDonut = document.getElementById('donutChart').getContext('2d');
+    const donutChart = new Chart(ctxDonut, {
+      type: 'doughnut',
+      data: {
+        labels: ['Apartments', 'Villas', 'Houses', 'Plots', 'Commercial'],
+        datasets: [{
+          data: [45, 20, 15, 12, 8],
+          backgroundColor: ['#0f172a', '#f59e0b', '#10b981', '#06b6d4', '#8b5cf6'],
+          borderWidth: 3,
+          borderColor: '#ffffff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '70%',
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    // Chart 3: Revenue Trend Line Chart
+    const ctxRev = document.getElementById('revenueLineChart').getContext('2d');
+    const greenGradient = ctxRev.createLinearGradient(0, 0, 0, 240);
+    greenGradient.addColorStop(0, 'rgba(16, 185, 129, 0.25)');
+    greenGradient.addColorStop(1, 'rgba(16, 185, 129, 0.01)');
+
+    const revenueLineChart = new Chart(ctxRev, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          label: 'Revenue',
+          data: [2.2, 2.8, 3.5, 3.2, 4.1, 4.5],
+          borderColor: '#10b981',
+          backgroundColor: greenGradient,
+          fill: true,
+          tension: 0.4,
+          borderWidth: 2.5,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          pointHoverBackgroundColor: '#10b981'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (context) => ` revenue : ${context.parsed.y}`
+            }
+          }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#94a3b8' } },
+          y: { min: 0, max: 8, ticks: { stepSize: 2, color: '#94a3b8' }, grid: { borderDash: [3, 3], color: '#f1f5f9' } }
+        }
+      }
+    });
+
+    // Chart 4: Horizontal Bar Chart
+    const ctxCity = document.getElementById('cityBarChart').getContext('2d');
+    const cityBarChart = new Chart(ctxCity, {
+      type: 'bar',
+      indexAxis: 'y',
+      data: {
+        labels: ['Bangalore', 'Mumbai', 'Delhi', 'Hyderabad', 'Chennai', 'Pune'],
+        datasets: [{
+          data: [330, 280, 240, 180, 150, 130],
+          backgroundColor: '#0284c7',
+          borderRadius: 4,
+          barThickness: 16
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { borderDash: [3, 3], color: '#f1f5f9' }, ticks: { color: '#94a3b8', stepSize: 80 } },
+          y: { grid: { display: false }, ticks: { color: '#475569', font: { weight: '600' } } }
+        }
+      }
+    });
+
+    // Timeframe selector live updates
+    document.getElementById('timeframeSelect').addEventListener('change', (e) => {
+      const tf = e.target.value;
+      if (tf === '30d') {
+        monthlyBarChart.data.datasets[0].data = [40, 50, 60, 55, 70, 75];
+        monthlyBarChart.data.datasets[1].data = [25, 30, 40, 35, 45, 50];
+        revenueLineChart.data.datasets[0].data = [0.8, 1.1, 1.4, 1.3, 1.6, 1.8];
+      } else if (tf === '1y') {
+        monthlyBarChart.data.datasets[0].data = [240, 290, 360, 330, 410, 450];
+        monthlyBarChart.data.datasets[1].data = [160, 190, 240, 220, 280, 320];
+        revenueLineChart.data.datasets[0].data = [4.4, 5.6, 7.0, 6.4, 8.2, 9.0];
+      } else {
+        monthlyBarChart.data.datasets[0].data = [120, 145, 180, 165, 205, 225];
+        monthlyBarChart.data.datasets[1].data = [80, 95, 120, 110, 140, 160];
+        revenueLineChart.data.datasets[0].data = [2.2, 2.8, 3.5, 3.2, 4.1, 4.5];
+      }
+      monthlyBarChart.update();
+      revenueLineChart.update();
+      showToast(`Updated analytics view for ${tf}`);
+    });
   </script>
 </body>
 </html>
