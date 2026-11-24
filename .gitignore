@@ -14,3 +14,40 @@ Thumbs.db
 
 # Logs and temp files
 *.log
+
+/vendor/
+/node_modules/
+/public/build/
+/public/hot
+/storage/*.key
+.env
+.env.*
+!.env.example
+/database/*.sqlite
+/database/*.sqlite-*
+/users.sql
+/post_properties*.sql
+
+# Images the app itself uses (the rules above ignore every image)
+!/public/favicon.ico
+!/public/images/
+!/public/images/**
+
+# Laravel runtime files
+/public/storage
+.phpunit.result.cache
+/.phpunit.cache
+
+# Local AI-assistant setup and personal notes
+/.agents/
+/.claude/
+/.codex/
+/.cursor/
+/.mcp.json
+/boost.json
+/mmetingnotest.txt
+
+# Database files, backups and copies (may hold real user / payment data)
+/database/*.sqlite*
+/database/*.bak*
+/database/live.sqlite *
